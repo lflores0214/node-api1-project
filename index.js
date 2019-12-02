@@ -73,9 +73,31 @@ server.delete("/users/:id", (req, res) => {
 });
 //PUT updates the user info with data from request body. returns modified document
 
-server.put("users/:id", (req, res) => {
+server.put("/users/:id", (req, res) => {
+  const id = req.params.id;
+  const userData = req.body;
 
-})
+  if (!userData.name || !userData.bio) {
+    res
+      .status(400)
+      .json({ errorMessage: "Please provide a name and bio for the user." })
+      .end()
+  } else {
+    db.update(id, userData)
+      .then(user => {
+
+        if(user) {
+          res.status(200).json({message: "The user info was updated", userData})
+        } else {
+          res.status(404).json({message: "This user does not exist"})
+        }
+      })
+      .catch(error => {
+        console.log("ERROR on POST /users", error);
+        res.status(500).json({ errorMessage: "error updating user" });
+      });
+  }
+});
 
 const port = 5000;
 server.listen(port, () =>
