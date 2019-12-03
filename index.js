@@ -2,10 +2,11 @@
 
 const express = require("express");
 const db = require("./data/db.js");
-
+const cors = require("cors")
 const server = express();
 
 server.use(express.json());
+server.use(cors());
 // req === request res === response AKA "the homies"
 server.get("/", (req, res) => {
   res.send({ api: "up and running." });
@@ -81,15 +82,16 @@ server.put("/users/:id", (req, res) => {
     res
       .status(400)
       .json({ errorMessage: "Please provide a name and bio for the user." })
-      .end()
+      .end();
   } else {
     db.update(id, userData)
       .then(user => {
-
-        if(user) {
-          res.status(200).json({message: "The user info was updated", userData})
+        if (user) {
+          res
+            .status(200)
+            .json({ message: "The user info was updated", userData });
         } else {
-          res.status(404).json({message: "This user does not exist"})
+          res.status(404).json({ message: "This user does not exist" });
         }
       })
       .catch(error => {
@@ -99,6 +101,7 @@ server.put("/users/:id", (req, res) => {
   }
 });
 
+// PORT
 const port = 5000;
 server.listen(port, () =>
   console.log(`\n ** API running on port ${port} ** \n`)
